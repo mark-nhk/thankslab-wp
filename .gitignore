@@ -1,0 +1,17 @@
+# Secrets — NEVER commit plaintext credentials
+.env
+.secrets/
+
+# Backups of production state before writes (local only)
+backups/
+
+# Unconfirmed ideas
+ideas/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db

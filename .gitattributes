@@ -1,0 +1,5 @@
+# Chuẩn hóa line ending: lưu LF trong repo, tránh CRLF phá shell script khi clone
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.enc binary
