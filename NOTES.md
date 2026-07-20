@@ -6,7 +6,7 @@
 ## 1. Site & truy cập
 
 - **URL production:** https://thankslab.com.vn/ — tên site "THANKSLAB VIETNAM".
-- **Stack:** WordPress **6.4.8** (cũ), PHP **8.3.31**, server **LiteSpeed**, theme **Flatsome Child v3.0** (parent Flatsome). Có **Plesk WP Toolkit** (nhưng chỉ phần Patchstack trong wp-admin).
+- **Stack:** WordPress **7.0.2** (đã update từ 6.4.8 ngày 2026-07-20), PHP **8.3.31**, server **LiteSpeed**, theme **Flatsome Child v3.0** (parent Flatsome). Có **Plesk WP Toolkit** (nhưng chỉ phần Patchstack trong wp-admin).
 - **Quyền của ta:** chỉ **wp-admin + REST** (không FTP/SSH; nhiều khả năng không có Plesk panel → không dùng được Clone/Backup của Plesk).
 - **Credential REST:** `WP_AUTH` trong `.env` (mã hóa ở `.env.enc`, giải mã: `bash tools/secrets.sh decrypt`). App password thuộc user **id=6** (`khoi.wappuri@gmail.com`, administrator). `.env` chỉ có 2 key: `WP_URL`, `WP_AUTH`.
 - ⚠️ **`thankslab.biz` là site KHÁC, không liên quan** (công ty Nhật). Đừng suy URL từ domain email.
@@ -43,20 +43,20 @@
 
 ## 5. ĐANG CHỜ — kế hoạch mai
 
-### Việc user tự làm (wp-admin, REST không làm được)
-1. **UpdraftPlus → Backup Now** (DB + files) — điểm lùi.
-2. **Update core** ở **Dashboard → Cập nhật** → lên **7.0.x** (KHÔNG phải trang WP Toolkit). Core mới nhất ~7.0.2.
-3. Sau core: **update 4 plugin** đang kẹt (Yoast→28.0, CPT UI→1.19.3, CF7→6.1.6, Really Simple SSL→9.6.1) — bỏ qua Advanced CF7 DB (sắp thay Flamingo). Rồi **Flatsome** (cần license).
-4. **Đổi mật khẩu** các admin thật (id 2, 6).
-5. **Quét malware bằng Imunify Security**; cân nhắc bật **Patchstack "Enable Protection"** (vá ảo).
-6. **Tắt xmlrpc** (WPCode snippet `xmlrpc_enabled __return_false` + gỡ pingback methods, hoặc chặn xmlrpc.php ở .htaccess).
-7. **Chặn readme.html**; dọn **comment spam**.
-8. Cân nhắc đổi username `admin` (id=1) & xóa `wordfen1` nếu không ai nhận.
+### ✅ Đã xong 2026-07-20
+- Git initial commit + push (remote `git@github.com:mark-nhk/thankslab-wp.git`) — user tự chạy vì classifier chặn `git commit`.
+- **Update core → 7.0.2** + toàn bộ plugin (verify OK: CF7 6.1.6, CPT UI 1.19.3, Really Simple Security 9.6.1, Yoast 28.0, ACF 6.8.6, LiteSpeed 7.8.1...). Site HTTP 200, không PHP error, REST auth chạy. Advanced CF7 DB user tự update lên **2.1.2**.
 
-### Việc agent làm qua REST (sau khi user báo core đã lên)
-- **Verify** version core + plugin.
-- **Cài Flamingo** (cần WP≥6.7 → sau core update) + **tắt Advanced CF7 DB**.
-- Tùy chọn: gỡ plugin inactive (backup trước; SeedProd có thể chứa page).
+### Việc user tự làm (wp-admin, REST không làm được)
+1. **Đổi mật khẩu** các admin thật (id 2, 6).
+2. **Quét malware bằng Imunify Security**; cân nhắc bật **Patchstack "Enable Protection"** (vá ảo).
+3. **Tắt xmlrpc** (WPCode snippet `xmlrpc_enabled __return_false` + gỡ pingback methods, hoặc chặn xmlrpc.php ở .htaccess).
+4. **Chặn readme.html** (vẫn truy cập được); dọn **~49 comment spam**.
+5. Cân nhắc đổi username `admin` (id=1) & xóa `wordfen1` nếu không ai nhận.
+
+### Việc agent làm qua REST (chờ user quyết)
+- **Lead:** Advanced CF7 DB giờ đã là bản mới nhất (2.1.2) → **hỏi lại**: vẫn thay Flamingo hay giữ luôn cái này? Nếu thay: cài Flamingo + tắt Advanced CF7 DB.
+- Tùy chọn: gỡ 5 plugin inactive (backup trước; SeedProd có thể chứa page).
 
 ## 6. Backups đã tạo (local, gitignored — `backups/`)
 
