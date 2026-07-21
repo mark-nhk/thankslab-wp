@@ -8,7 +8,7 @@
 - **URL production:** https://thankslab.com.vn/ — tên site "THANKSLAB VIETNAM".
 - **Stack:** WordPress **7.0.2** (đã update từ 6.4.8 ngày 2026-07-20), PHP **8.3.31**, server **LiteSpeed**, theme **Flatsome Child v3.0** (parent Flatsome). Có **Plesk WP Toolkit** (nhưng chỉ phần Patchstack trong wp-admin).
 - **Quyền của ta:** chỉ **wp-admin + REST** (không FTP/SSH; nhiều khả năng không có Plesk panel → không dùng được Clone/Backup của Plesk).
-- **Credential REST:** `WP_AUTH` trong `.env` (mã hóa ở `.env.enc`, giải mã: `bash tools/secrets.sh decrypt`). App password thuộc user **id=6** (`khoi.wappuri@gmail.com`, administrator). `.env` chỉ có 2 key: `WP_URL`, `WP_AUTH`.
+- **Credential REST:** `WP_AUTH` trong `.env` (mã hóa ở `.env.enc`, giải mã: `bash tools/secrets.sh decrypt`). App password thuộc user **id=6** (`khoi.wappuri@gmail.com`, administrator). `.env` có 3 key: `WP_URL`, `WP_AUTH`, **`BREVO_KEY`** (API key Brevo của site này, thêm 21/07 — dùng check log gửi mail: `GET https://api.brevo.com/v3/smtp/statistics/events?email=<addr>` header `api-key`; lưu ý tên key là `BREVO_KEY`, không phải `BREVO_API_KEY` như fitrack).
 - ⚠️ **`thankslab.biz` là site KHÁC, không liên quan** (công ty Nhật). Đừng suy URL từ domain email.
 
 ## 2. Đã làm 2026-07-20 — tất cả qua REST, có backup ở `backups/`
@@ -66,7 +66,7 @@
 - **2026-07-20:** git init + push (remote `git@github.com:mark-nhk/thankslab-wp.git`); update core →7.0.2 + toàn bộ plugin, verify OK.
 - **2026-07-21:** fix Contact Form (tắt wp-mail-smtp hỏng config); Flamingo thay Advanced CF7 DB (ACF7DB đã xóa hẳn sau khi user check lead); trash 50 comment spam; xóa `wordfen1`; gỡ 7 plugin không dùng (SeedProd, Nextend, OptinMonster, RafflePress, MonsterInsights*, WPForms Lite, Popup Builder — *user xóa tay vì REST 500); display name public sạch. Site còn **16 plugin**, 4 user.
 
-### 🔴 Việc user — SMTP BREVO (đã chốt 2026-07-21, làm sớm để mail hết cảnh PHP mail)
+### ✅ SMTP Brevo — HOÀN THÀNH TRỌN GÓI 21/07 (giữ làm hồ sơ)
 1. ~~Tạo Brevo + API key~~ → **ĐÃ XONG** (21/07 tối: sender + API key đã tạo).
 2. ~~Vendor thêm DNS record~~ → **XONG 21/07**: vendor đã thêm đủ **8 record** (gồm cả SPF `include:spf.brevo.com ~all` theo template fit-track — Brevo flow mới không đòi SPF nhưng thêm vô hại; file gửi vendor: `D:\W\dns-brevo-thankslab.csv`). Verify 21/07 qua 8.8.8.8 + 1.1.1.1: **cả 8 đúng từng byte**. → User bấm **Verify** trong Brevo → Domains.
 3. ~~Kích hoạt + config WP Mail SMTP~~ → **XONG 21/07**: domain Authenticated trong Brevo (branding `em/img.em/r.em` chờ checker xanh — cosmetic); sender **`no-reply@thankslab.com.vn`** Verified (DKIM ✅ DMARC ✅); WP Mail SMTP active, mailer Brevo, Sending Domain `thankslab.com.vn`, Email Test OK.
@@ -78,18 +78,19 @@
 3. **E2E nghiệm thu cuối 21/07: "sent" thành công** với config mới. Toàn tuyến chốt: form → CF7 → WP Mail SMTP (Brevo API) → info-vn@thankslab.biz + CC Linh; lead lưu Flamingo.
 4. Còn lại (không gấp): dọn entry TEST trong Flamingo + mail TEST trong các inbox; `mail_2` off là đúng (form không thu email khách).
 
-### Việc user — còn lại
+### Việc user — còn lại (đầu phiên sau)
 1. **Check Settings → 301 Redirects**: trống → báo agent gỡ plugin Simple 301 Redirects; có rules → giữ (REST không đọc được rules).
 2. **Check 2 mã GA song song** (`G-0PBTPYTV2B`, `G-N5T07F6SGD` — trong Insert Headers & Footers): 1 cái có thể legacy thừa.
 3. **Đổi mật khẩu** 2 admin thật (id 2, 6). **Quét malware Imunify**; cân nhắc bật **Patchstack Protection**.
 4. **Tắt xmlrpc** (snippet `xmlrpc_enabled __return_false` hoặc chặn .htaccess); **chặn readme.html**.
 5. Cân nhắc đổi username `admin` (id=1).
-6. Xóa các mail TEST đánh dấu "bỏ qua" trong hộp thư Linh + CC (tungtps@xhs.vn).
+6. **Dọn TEST**: entry `TEST` trong Flamingo → Inbound; mail TEST trong inbox Linh, `tungtps@xhs.vn` (các test sáng), `info-vn@thankslab.biz` (test nghiệm thu).
+7. Brevo branding (`em/img.em/r.em`) đang "Not branded" — cosmetic; nếu vài ngày chưa tự xanh thì bấm re-check trong Brevo → Domains.
 
 ### Việc agent (phiên sau)
-- Verify Brevo sau khi user config (submit TEST + nslookup DKIM/brevo-code).
 - Xử lý post lạ `__trashed` (https://thankslab.com.vn/__trashed/ — publish, slug hỏng SEO): xem nội dung → sửa slug hoặc trash, user chốt.
 - Gỡ Simple 301 Redirects nếu user báo trống.
+- Có `BREVO_KEY` trong `.env` → có thể tự check log delivered/bounce khi cần.
 - Khi mọi thứ ổn định: viết `tools/health_check.py` chỉ-đọc theo baseline site này (xem CLAUDE.md).
 
 ## 6. Backups đã tạo (local, gitignored — `backups/`)
