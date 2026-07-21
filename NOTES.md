@@ -72,11 +72,11 @@
 3. ~~Kích hoạt + config WP Mail SMTP~~ → **XONG 21/07**: domain Authenticated trong Brevo (branding `em/img.em/r.em` chờ checker xanh — cosmetic); sender **`no-reply@thankslab.com.vn`** Verified (DKIM ✅ DMARC ✅); WP Mail SMTP active, mailer Brevo, Sending Domain `thankslab.com.vn`, Email Test OK.
 4. ~~Verify trọn gói~~ → **XONG 21/07**: E2E qua browser (đường khách thật: delay-JS → AJAX → CF7 → Brevo) = **"sent" thành công**. Toàn bộ 16 plugin active, 0 inactive.
 
-### 🟡 Còn lại sau audit form 17 (21/07 tối)
-1. **BUG mail body form 17: thiếu trường `[diachi]`** — khách điền Địa chỉ nhưng mail không chứa (Flamingo vẫn lưu đủ). Footer body còn ghi "Form nhận file báo giá" (text copy từ form khác). **User sửa trong wp-admin** (CF7 REST không ghi được): Contact → Contact Forms → "Contact form" → tab Mail → thay Message body + From (template trong chat/NOTES). Sender form nên đổi `wordpress@` → `no-reply@thankslab.com.vn` cho khớp Brevo (hiện Force From Email vẫn đè đúng nên không gấp).
-2. **Hỏi user: CC `tungtps@xhs.vn` (vendor) trong mail lead** — còn muốn vendor nhận mọi lead không? Bỏ CC thì sửa cùng lúc ở tab Mail.
-3. Dọn các entry TEST trong **Flamingo → Inbound** + mail TEST trong inbox Linh/CC.
-4. `mail_2` (autoreply) đang off — đúng, vì form không thu email khách.
+### ✅ Audit form 17 — ĐÓNG (21/07 tối)
+1. ~~BUG mail body thiếu `[diachi]`~~ → **user đã sửa trong wp-admin**, verify qua REST: body đủ 3 trường + footer đúng ngữ cảnh.
+2. Đồng thời user revamp mail config: **recipient → `info-vn@thankslab.biz`**, **CC → Linh** (bỏ hẳn vendor `tungtps@xhs.vn`), subject → "Liên hệ về Thankslab Vietnam", From → `no-reply@thankslab.com.vn` (khớp sender Brevo).
+3. **E2E nghiệm thu cuối 21/07: "sent" thành công** với config mới. Toàn tuyến chốt: form → CF7 → WP Mail SMTP (Brevo API) → info-vn@thankslab.biz + CC Linh; lead lưu Flamingo.
+4. Còn lại (không gấp): dọn entry TEST trong Flamingo + mail TEST trong các inbox; `mail_2` off là đúng (form không thu email khách).
 
 ### Việc user — còn lại
 1. **Check Settings → 301 Redirects**: trống → báo agent gỡ plugin Simple 301 Redirects; có rules → giữ (REST không đọc được rules).
