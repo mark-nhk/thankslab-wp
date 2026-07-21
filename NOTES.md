@@ -68,7 +68,7 @@
 
 ### 🔴 Việc user — SMTP BREVO (đã chốt 2026-07-21, làm sớm để mail hết cảnh PHP mail)
 1. ~~Tạo Brevo + API key~~ → **ĐÃ XONG** (21/07 tối: sender + API key đã tạo).
-2. **ĐANG CHỜ VENDOR thêm 7 DNS record** tại zonedns.vn (đã check không xung đột — cả 7 name chưa tồn tại; tin nhắn gửi vendor đã soạn 21/07): TXT `@` brevo-code `d08d91cf...`; CNAME `brevo1/brevo2._domainkey` → `b1/b2.thankslab-com-vn.dkim.brevo.com`; TXT `_dmarc` (p=none); CNAME `em`/`img.em`/`r.em` → `*.brand.brevosend.com`. Brevo không cần SPF. Vendor xong → chờ DNS lan (TTL 1h) → bấm **Verify** trong Brevo.
+2. ~~Vendor thêm DNS record~~ → **XONG 21/07**: vendor đã thêm đủ **8 record** (gồm cả SPF `include:spf.brevo.com ~all` theo template fit-track — Brevo flow mới không đòi SPF nhưng thêm vô hại; file gửi vendor: `D:\W\dns-brevo-thankslab.csv`). Verify 21/07 qua 8.8.8.8 + 1.1.1.1: **cả 8 đúng từng byte**. → User bấm **Verify** trong Brevo → Domains.
 3. wp-admin → Plugins → **kích hoạt WP Mail SMTP** → config NGAY (config cũ hỏng, bật mà chưa đổi là form chết lại): Mailer = **Brevo**, dán API key, From = `wordpress@thankslab.com.vn` (sau domain auth), From Name = THANKSLAB VIETNAM, **Force From Email** ON.
 4. Tab **Email Test** gửi thử → báo agent verify trọn gói (nslookup 7 record + submit TEST form).
 
