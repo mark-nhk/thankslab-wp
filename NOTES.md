@@ -35,7 +35,7 @@
 | Display name | User đã tự sửa trong wp-admin; verify public = `OneSe`/`Linh`/`Mark` — hết lộ email/`admin`. |
 
 **Phát hiện kèm theo (2026-07-21):**
-- **CF7 6.1.x REST từ chối GHI form một cách im lặng** (POST tạo/sửa trả 200 + object nhưng không persist, id=null) — đọc/xóa vẫn OK. Endpoint `/feedback` đòi `multipart/form-data` (urlencoded → HTTP 415). Cập nhật khi cần sửa form: làm trong wp-admin.
+- **CF7 6.1.x REST từ chối GHI form một cách im lặng** (POST tạo/sửa trả 200 + object nhưng không persist, id=null) — đã thử CẢ HAI contract: form-encoded `mail[...]` VÀ JSON `{"properties":{"mail":{...}}}` (21/07 chiều) — đều không ăn. Đọc/xóa vẫn OK. **Sửa form = wp-admin, khỏi thử REST nữa.** Endpoint `/feedback` đòi `multipart/form-data` (urlencoded → HTTP 415).
 - LiteSpeed **Delay JS** đang bật: JS (kể cả CF7) chỉ chạy sau tương tác đầu tiên của khách — form vẫn hoạt động vì LiteSpeed re-dispatch DOMContentLoaded, nhưng cần nhớ khi debug "JS không chạy".
 - Bundle delay JS còn load **jQuery 3.5.1 đè lên 3.7.1** (theme/builder nhúng bản cũ) — chưa gây lỗi thấy được, ghi nhận thôi.
 - Validation tel của CF7 6.x chặn số giả dạng `0000000000` nhưng số VN thật pass — không phải bug.
@@ -69,8 +69,14 @@
 ### 🔴 Việc user — SMTP BREVO (đã chốt 2026-07-21, làm sớm để mail hết cảnh PHP mail)
 1. ~~Tạo Brevo + API key~~ → **ĐÃ XONG** (21/07 tối: sender + API key đã tạo).
 2. ~~Vendor thêm DNS record~~ → **XONG 21/07**: vendor đã thêm đủ **8 record** (gồm cả SPF `include:spf.brevo.com ~all` theo template fit-track — Brevo flow mới không đòi SPF nhưng thêm vô hại; file gửi vendor: `D:\W\dns-brevo-thankslab.csv`). Verify 21/07 qua 8.8.8.8 + 1.1.1.1: **cả 8 đúng từng byte**. → User bấm **Verify** trong Brevo → Domains.
-3. wp-admin → Plugins → **kích hoạt WP Mail SMTP** → config NGAY (config cũ hỏng, bật mà chưa đổi là form chết lại): Mailer = **Brevo**, dán API key, From = `wordpress@thankslab.com.vn` (sau domain auth), From Name = THANKSLAB VIETNAM, **Force From Email** ON.
-4. Tab **Email Test** gửi thử → báo agent verify trọn gói (nslookup 7 record + submit TEST form).
+3. ~~Kích hoạt + config WP Mail SMTP~~ → **XONG 21/07**: domain Authenticated trong Brevo (branding `em/img.em/r.em` chờ checker xanh — cosmetic); sender **`no-reply@thankslab.com.vn`** Verified (DKIM ✅ DMARC ✅); WP Mail SMTP active, mailer Brevo, Sending Domain `thankslab.com.vn`, Email Test OK.
+4. ~~Verify trọn gói~~ → **XONG 21/07**: E2E qua browser (đường khách thật: delay-JS → AJAX → CF7 → Brevo) = **"sent" thành công**. Toàn bộ 16 plugin active, 0 inactive.
+
+### 🟡 Còn lại sau audit form 17 (21/07 tối)
+1. **BUG mail body form 17: thiếu trường `[diachi]`** — khách điền Địa chỉ nhưng mail không chứa (Flamingo vẫn lưu đủ). Footer body còn ghi "Form nhận file báo giá" (text copy từ form khác). **User sửa trong wp-admin** (CF7 REST không ghi được): Contact → Contact Forms → "Contact form" → tab Mail → thay Message body + From (template trong chat/NOTES). Sender form nên đổi `wordpress@` → `no-reply@thankslab.com.vn` cho khớp Brevo (hiện Force From Email vẫn đè đúng nên không gấp).
+2. **Hỏi user: CC `tungtps@xhs.vn` (vendor) trong mail lead** — còn muốn vendor nhận mọi lead không? Bỏ CC thì sửa cùng lúc ở tab Mail.
+3. Dọn các entry TEST trong **Flamingo → Inbound** + mail TEST trong inbox Linh/CC.
+4. `mail_2` (autoreply) đang off — đúng, vì form không thu email khách.
 
 ### Việc user — còn lại
 1. **Check Settings → 301 Redirects**: trống → báo agent gỡ plugin Simple 301 Redirects; có rules → giữ (REST không đọc được rules).
