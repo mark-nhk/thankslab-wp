@@ -67,10 +67,10 @@
 - **2026-07-21:** fix Contact Form (tắt wp-mail-smtp hỏng config); Flamingo thay Advanced CF7 DB (ACF7DB đã xóa hẳn sau khi user check lead); trash 50 comment spam; xóa `wordfen1`; gỡ 7 plugin không dùng (SeedProd, Nextend, OptinMonster, RafflePress, MonsterInsights*, WPForms Lite, Popup Builder — *user xóa tay vì REST 500); display name public sạch. Site còn **16 plugin**, 4 user.
 
 ### 🔴 Việc user — SMTP BREVO (đã chốt 2026-07-21, làm sớm để mail hết cảnh PHP mail)
-1. Tạo/đăng nhập **Brevo** (free 300 mail/ngày) → Settings → **SMTP & API → API Keys** → tạo API key (v3).
-2. Brevo → **Senders & Domains → Domains** → thêm `thankslab.com.vn` → thêm các DNS record Brevo yêu cầu (brevo-code + DKIM) tại **zonedns.vn**. Domain không có MX/SPF nên không đụng chạm gì. (Đường tắt tạm: verify single sender `system-vn@thankslab.biz` qua link email.)
+1. ~~Tạo Brevo + API key~~ → **ĐÃ XONG** (21/07 tối: sender + API key đã tạo).
+2. **ĐANG CHỜ VENDOR thêm 7 DNS record** tại zonedns.vn (đã check không xung đột — cả 7 name chưa tồn tại; tin nhắn gửi vendor đã soạn 21/07): TXT `@` brevo-code `d08d91cf...`; CNAME `brevo1/brevo2._domainkey` → `b1/b2.thankslab-com-vn.dkim.brevo.com`; TXT `_dmarc` (p=none); CNAME `em`/`img.em`/`r.em` → `*.brand.brevosend.com`. Brevo không cần SPF. Vendor xong → chờ DNS lan (TTL 1h) → bấm **Verify** trong Brevo.
 3. wp-admin → Plugins → **kích hoạt WP Mail SMTP** → config NGAY (config cũ hỏng, bật mà chưa đổi là form chết lại): Mailer = **Brevo**, dán API key, From = `wordpress@thankslab.com.vn` (sau domain auth), From Name = THANKSLAB VIETNAM, **Force From Email** ON.
-4. Tab **Email Test** gửi thử → báo agent verify trọn gói (submit TEST form + check DNS).
+4. Tab **Email Test** gửi thử → báo agent verify trọn gói (nslookup 7 record + submit TEST form).
 
 ### Việc user — còn lại
 1. **Check Settings → 301 Redirects**: trống → báo agent gỡ plugin Simple 301 Redirects; có rules → giữ (REST không đọc được rules).
